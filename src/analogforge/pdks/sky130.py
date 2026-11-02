@@ -135,8 +135,9 @@ def install_sky130(wheel: str | None = None, dest: str | None = None, quiet: boo
     target = Path(dest) if dest else cache_dir() / "pdk" / "sky130_fd_pr"
     with tempfile.TemporaryDirectory(prefix="af_sky130_") as tmp:
         if wheel is None:
+            # only data files are extracted from the wheel, so its Python requirement (>=3.12) is irrelevant
             cmd = [sys.executable, "-m", "pip", "download", "--no-deps", "--only-binary=:all:",
-                   SKY130_WHEEL_SPEC, "-d", tmp]
+                   "--ignore-requires-python", SKY130_WHEEL_SPEC, "-d", tmp]
             if not quiet:
                 print("[analogforge] downloading", SKY130_WHEEL_SPEC, "from PyPI ...", flush=True)
             proc = subprocess.run(cmd, capture_output=True, text=True)

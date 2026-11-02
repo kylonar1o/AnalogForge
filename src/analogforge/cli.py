@@ -438,7 +438,7 @@ def main(argv: list[str] | None = None) -> int:
         return int(args.func(args) or 0)
     except KeyboardInterrupt:  # pragma: no cover
         return 130
-    except (KeyError, ValueError, FileNotFoundError) as exc:
+    except (KeyError, ValueError, FileNotFoundError, RuntimeError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
