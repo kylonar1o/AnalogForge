@@ -1,0 +1,36 @@
+# Cross-coupled LC VCO described in YAML (ideal tail source, fixed capacitors).
+# The full-featured VCO (varactor tuning, phase noise, FoM) is the built-in Python design `lc_vco`.
+name: lc_vco_simple
+title: Cross-coupled LC oscillator (YAML)
+kind: oscillator
+parameters:
+  VDD: {default: 1.8, unit: V, tunable: false}
+  ITAIL: {default: 2m, min: 0.5m, max: 5m, unit: A, log: true}
+  WN: {default: 20u, min: 5u, max: 60u, unit: m, log: true}
+  LTANK: {default: 2n, min: 0.5n, max: 5n, unit: H, log: true}
+  CTANK: {default: 1p, min: 0.2p, max: 5p, unit: F, log: true}
+  RP: {default: 300, min: 100, max: 2k, unit: Ohm}
+circuit:
+  - {type: vsource, name: VDD, p: vdd, n: 0, dc: "VDD*vdd_scale"}
+  - {type: inductor, name: L1, nodes: [vdd, outp], value: LTANK}
+  - {type: inductor, name: L2, nodes: [vdd, outn], value: LTANK}
+  - {type: resistor, name: R1, nodes: [vdd, outp], value: RP}
+  - {type: resistor, name: R2, nodes: [vdd, outn], value: RP}
+  - {type: capacitor, name: C1, nodes: [outp, 0], value: CTANK}
+  - {type: capacitor, name: C2, nodes: [outn, 0], value: CTANK}
+  - {type: nmos, name: M1, d: outp, g: outn, s: tail, b: 0, w: WN, l: 0.15u}
+  - {type: nmos, name: M2, d: outn, g: outp, s: tail, b: 0, w: WN, l: 0.15u}
+  - {type: isource, name: ITAIL, p: tail, n: 0, dc: ITAIL}
+  - {type: isource, name: IKICK, p: 0, n: outp, pulse: {v1: 0, v2: 100u, delay: 0.1n, rise: 10p, fall: 10p, width: 100p, period: 1}}
+testbenches:
+  - name: main
+    analyses:
+      - {type: tran, name: tran, tstop: 30n, tstep: 4p, tmax: 4p}
+metrics:
+  - {name: f_osc, extractor: osc_frequency, analysis: tran, signal: "v(outp)-v(outn)", args: {fraction: 0.3}, unit: Hz}
+  - {name: f_lc, expr: "1/(2*pi*sqrt(LTANK*CTANK))", unit: Hz}
+  - {name: amplitude_diff, extractor: amplitude, analysis: tran, signal: "v(outp)-v(outn)", args: {fraction: 0.2}, unit: V}
+  - {name: amplitude_hand, expr: "4/pi*ITAIL*RP", unit: V}
+  - {name: power, extractor: supply_power, analysis: tran, signal: VDD, args: {vdd: "VDD*vdd_scale", fraction: 0.3}, unit: W}
+plots:
+  - {name: waveform, analysis: tran, signals: ["v(outp)-v(outn)"], title: "Differential output", ylabel: "V"}

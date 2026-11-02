@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AnalogForge</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/plotly.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+<header>
+  <div class="brand">AnalogForge <span id="version" class="muted"></span></div>
+  <nav id="tabs">
+    <button data-tab="new" class="active">New job</button>
+    <button data-tab="jobs">Jobs</button>
+    <button data-tab="compare">Compare <span id="cmp-count" class="badge">0</span></button>
+    <button data-tab="netlist">Netlist export</button>
+    <button data-tab="system">System</button>
+  </nav>
+</header>
+<main>
+  <!-- ======================================================= new job -->
+  <section id="tab-new" class="tab active">
+    <div class="grid2">
+      <div class="card">
+        <h2>Job</h2>
+        <label>Design <select id="f-design"></select></label>
+        <p id="f-design-desc" class="muted small pre"></p>
+        <label>Job type
+          <select id="f-kind">
+            <option value="simulate">simulate (one point)</option>
+            <option value="sweep">parameter sweep</option>
+            <option value="corners">PVT corners</option>
+            <option value="optimize">optimize</option>
+          </select></label>
+        <div class="row">
+          <label>Backend <select id="f-backend"></select></label>
+          <label>PDK <select id="f-pdk"></select></label>
+        </div>
+        <div class="row">
+          <label>Corner <select id="f-corner"></select></label>
+          <label>Temp (&deg;C) <input id="f-temp" type="number" value="27" step="1"></label>
+          <label>VDD scale <input id="f-vdd" type="number" value="1" step="0.05"></label>
+        </div>
+        <div class="row">
+          <label>Name <input id="f-name" placeholder="optional"></label>
+          <label>Parallel workers <input id="f-workers" type="number" min="1" placeholder="auto"></label>
+        </div>
+        <label>Design options (JSON)<textarea id="f-options" rows="4" spellcheck="false"></textarea></label>
+      </div>
+      <div class="card" id="kind-panels">
+        <div data-kind="simulate"><h2>Simulate</h2><p class="muted">Evaluates the design once with the parameter values on the left table.</p></div>
+        <div data-kind="sweep"><h2>Sweep</h2>
+          <p class="muted">Enter a sweep spec in the <b>Sweep</b> column of the parameter table:
+            <code>start:stop:num</code>, <code>start:stop:num:log</code> or <code>v1,v2,v3</code>.
+            Corner / temperature / VDD-scale sweeps:</p>
+          <div class="row">
+            <label>corner <input id="sw-corner" placeholder="e.g. tt,ff,ss"></label>
+            <label>temperature <input id="sw-temp" placeholder="e.g. -40,27,125"></label>
+            <label>vdd_scale <input id="sw-vdd" placeholder="e.g. 0.9,1,1.1"></label>
+          </div>
+          <label>Mode <select id="sw-mode"><option>grid</option><option>zip</option></select></label>
+        </div>
+        <div data-kind="corners"><h2>PVT corners</h2>
+          <div id="pvt-process" class="checks"></div>
+          <label>Supply scale factors <input id="pvt-voltage" value="0.9,1.0,1.1"></label>
+          <label>Temperatures (&deg;C) <input id="pvt-temp" value="-40,27,125"></label>
+        </div>
+        <div data-kind="optimize"><h2>Optimize</h2>
+          <p class="muted">Tick parameters in the <b>Opt</b> column (ranges editable).</p>
+          <div class="row">
+            <label>Goal <select id="op-goal"><option>max</option><option>min</option></select></label>
+            <label>Metric <select id="op-metric"></select></label>
+          </div>
+          <label>Constraints (one per line, e.g. <code>phase_margin &gt;= 60</code>)<textarea id="op-cons" rows="4"></textarea></label>
+          <div class="row">
+            <label>Method <select id="op-method"><option>bayes</option><option>de</option><option>nelder-mead</option><option>random</option></select></label>
+            <label>Budget <input id="op-budget" type="number" value="24" min="2"></label>
+            <label>Seed <input id="op-seed" type="number" value="0"></label>
+          </div>
+        </div>
+        <button id="submit" class="primary">Submit job</button>
+        <span id="submit-msg" class="small"></span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Parameters</h2>
+      <div class="scroll"><table id="param-table" class="data"></table></div>
+    </div>
+  </section>
+
+  <!-- ======================================================= jobs -->
+  <section id="tab-jobs" class="tab">
+    <div class="card">
+      <h2>Jobs <button id="refresh-jobs" class="small-btn">refresh</button></h2>
+      <div class="scroll"><table id="jobs-table" class="data"></table></div>
+    </div>
+    <div id="job-detail" class="card hidden"></div>
+    <div id="run-detail" class="card hidden"></div>
+  </section>
+
+  <!-- ======================================================= compare -->
+  <section id="tab-compare" class="tab">
+    <div class="card">
+      <h2>Compare runs <button id="cmp-clear" class="small-btn">clear selection</button></h2>
+      <p class="muted">Select runs with the &#9745; column in a job's run table.</p>
+      <div class="scroll"><table id="cmp-table" class="data"></table></div>
+      <label>Overlay curve <select id="cmp-curve"></select></label>
+      <div id="cmp-plot" class="plot"></div>
+    </div>
+  </section>
+
+  <!-- ======================================================= netlist -->
+  <section id="tab-netlist" class="tab">
+    <div class="card">
+      <h2>Netlist export</h2>
+      <p class="muted">Generate the input deck for any backend (ngspice, Cadence Spectre incl. OCEAN script, Keysight ADS).
+        Spectre/ADS need a PDK profile with model paths for your PDK (see docs).</p>
+      <div class="row">
+        <label>Design <select id="n-design"></select></label>
+        <label>Backend <select id="n-backend"></select></label>
+        <label>PDK <select id="n-pdk"></select></label>
+        <label>Corner <input id="n-corner" placeholder="default"></label>
+      </div>
+      <label>Parameter overrides (NAME=VALUE per line)<textarea id="n-params" rows="3"></textarea></label>
+      <button id="n-go" class="primary">Generate</button>
+      <div id="n-out"></div>
+    </div>
+  </section>
+
+  <!-- ======================================================= system -->
+  <section id="tab-system" class="tab">
+    <div class="card"><h2>System</h2><div id="sys-out"></div></div>
+  </section>
+</main>
+<footer class="muted small">AnalogForge &mdash; open-source, simulator-agnostic analog/RF design automation. SKY130 models &copy; SkyWater/Google (Apache-2.0).</footer>
+</body>
+</html>

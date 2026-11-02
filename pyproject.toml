@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "analogforge"
+version = "0.1.0"
+description = "Simulator-agnostic analog/RF IC design automation (ngspice + SKY130 reference backend, Cadence Spectre/OCEAN and Keysight ADS adapters): oscillator and amplifier metrics, sweeps, PVT, optimization, SQLite, web UI."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "AnalogForge contributors" }]
+keywords = ["analog", "rf", "eda", "vco", "phase-noise", "ngspice", "spectre", "ocean", "ads", "sky130", "optimization"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "matplotlib>=3.7",
+    "PyYAML>=6.0",
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
+    "plotly>=5.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "httpx>=0.25"]
+
+[project.scripts]
+analogforge = "analogforge.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+analogforge = ["web/static/*", "pdks/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "ngspice: test requires the ngspice executable",
+    "sky130: test requires the SkyWater SKY130 open PDK models",
+]
+addopts = "-ra"

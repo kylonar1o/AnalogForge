@@ -1,0 +1,12 @@
+kind: optimize
+name: Op-amp UGBW optimization
+design: two_stage_opamp
+options: {tran: false, psrr: false}
+optimize:
+  method: bayes
+  variables: [W1, W6, CC, IBIAS]
+  objective: "max:ugbw"
+  constraints: ["phase_margin >= 60", "gain_db >= 60", "power <= 0.4e-3"]
+  budget: 30
+  seed: 0
+workers: 4

@@ -1,0 +1,23 @@
+# Minimal YAML design (no PDK devices): first-order RC low-pass.
+# analogforge simulate examples/designs/rc_lowpass.yaml
+name: rc_lowpass
+title: RC low-pass filter
+kind: amplifier
+description: First-order RC low-pass; f3dB should equal 1/(2*pi*R*C).
+parameters:
+  R: {default: 1k, min: 100, max: 100k, unit: Ohm, log: true}
+  C: {default: 1p, min: 0.1p, max: 10p, unit: F, log: true}
+circuit:
+  - {type: vsource, name: VIN, p: in, n: 0, dc: 0, ac: 1}
+  - {type: resistor, name: R1, nodes: [in, out], value: R}
+  - {type: capacitor, name: C1, nodes: [out, 0], value: C}
+testbenches:
+  - name: main
+    analyses:
+      - {type: ac, name: ac, fstart: 1k, fstop: 100g, ppd: 20}
+metrics:
+  - {name: f3db, extractor: bandwidth_3db, analysis: ac, signal: "v(out)", unit: Hz, goal: max}
+  - {name: f3db_expected, expr: "1/(2*pi*R*C)", unit: Hz}
+  - {name: error_pct, expr: "100*(f3db - f3db_expected)/f3db_expected", unit: "%"}
+plots:
+  - {name: bode, analysis: ac, signals: ["v(out)"], db: true, title: "RC low-pass", ylabel: "dB"}

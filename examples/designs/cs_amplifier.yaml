@@ -1,0 +1,34 @@
+# Common-source amplifier in SKY130 described in YAML (shows PDK devices, DC servo, expressions).
+name: cs_amplifier
+title: SKY130 common-source amplifier with resistive load
+kind: amplifier
+parameters:
+  VDD: {default: 1.8, unit: V, tunable: false}
+  W: {default: 10u, min: 1u, max: 50u, unit: m, log: true}
+  L: {default: 0.5u, min: 0.15u, max: 2u, unit: m}
+  RD: {default: 8k, min: 1k, max: 50k, unit: Ohm, log: true}
+  IBIAS: {default: 100u, min: 10u, max: 500u, unit: A, log: true}
+  CL: {default: 1p, unit: F, tunable: false}
+circuit:
+  - {type: vsource, name: VDD, p: vdd, n: 0, dc: "VDD*vdd_scale"}
+  - {type: isource, name: IREF, p: vdd, n: nb, dc: IBIAS}
+  - {type: nmos, name: M0, d: nb, g: nb, s: 0, b: 0, w: W, l: L}
+  - {type: vsource, name: VIN, p: g, n: nb, dc: 0, ac: 1}
+  - {type: nmos, name: M1, d: out, g: g, s: 0, b: 0, w: W, l: L}
+  - {type: resistor, name: RD, nodes: [vdd, out], value: RD}
+  - {type: capacitor, name: CL, nodes: [out, 0], value: CL}
+testbenches:
+  - name: main
+    analyses:
+      - {type: op, name: op}
+      - {type: ac, name: ac, fstart: 1, fstop: 100g, ppd: 20}
+    save_op: [M1]
+metrics:
+  - {name: gain_db, extractor: gain_db, analysis: ac, signal: "v(out)/(v(g)-v(nb))", unit: dB, goal: max}
+  - {name: f3db, extractor: bandwidth_3db, analysis: ac, signal: "v(out)", unit: Hz, goal: max}
+  - {name: power, extractor: supply_power, analysis: op, signal: VDD, args: {vdd: "VDD*vdd_scale"}, unit: W, goal: min}
+  - {name: vout_dc, extractor: value, analysis: op, signal: "v(out)", unit: V}
+  - {name: gm, extractor: value, analysis: op, signal: "op(m1, gm)", unit: S}
+  - {name: gain_hand_db, expr: "20*log10(gm*RD)", unit: dB}
+plots:
+  - {name: bode, analysis: ac, signals: ["v(out)"], db: true, title: "CS amplifier gain", ylabel: "dB"}

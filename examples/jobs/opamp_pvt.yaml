@@ -1,0 +1,7 @@
+kind: corners
+name: Op-amp PVT
+design: two_stage_opamp
+corners:
+  process: [tt, ff, ss, sf, fs]
+  voltage: [0.9, 1.0, 1.1]
+  temperature: [-40, 27, 125]

@@ -1,0 +1,29 @@
+# Drive an EXISTING Virtuoso/ADE testbench through OCEAN ("cellview" mode of the Spectre backend).
+# The circuit lives in Virtuoso; AnalogForge only sets design variables (desVar), runs the analyses
+# listed here and post-processes the exported probe waveforms.  Use on a Cadence machine:
+#
+#   analogforge simulate examples/designs/virtuoso_vco_tb.yaml --backend spectre \
+#       --pdk ~/.analogforge/pdks/mypdk.yaml \
+#       --backend-opt mode=ocean --backend-opt cellview=MyLib/vco_tb/schematic
+#
+#   analogforge sweep examples/designs/virtuoso_vco_tb.yaml --var Vtune=0:1.2:7 --backend spectre ...
+#
+# Parameter names must equal the design variables of your ADE testbench; probe node names must
+# exist in the schematic (top level).
+name: virtuoso_vco_tb
+title: Virtuoso VCO testbench driven via OCEAN
+kind: oscillator
+parameters:
+  Ibias: {default: 2m, min: 0.5m, max: 4m, unit: A, log: true}
+  Vtune: {default: 0.6, min: 0, max: 1.2, unit: V}
+  VDD: {default: 1.2, unit: V, tunable: false}
+circuit: []
+testbenches:
+  - name: tran
+    analyses:
+      - {type: tran, name: tran, tstop: 50n, tmax: 2p}
+    probes: ["v(outp)", "v(outn)", "i(VDD)"]
+metrics:
+  - {name: f_osc, extractor: osc_frequency, analysis: tran, signal: "v(outp)-v(outn)", args: {fraction: 0.3}, unit: Hz}
+  - {name: amplitude_diff, extractor: amplitude, analysis: tran, signal: "v(outp)-v(outn)", unit: V}
+  - {name: power, extractor: supply_power, analysis: tran, signal: VDD, args: {vdd: VDD}, unit: W, goal: min}

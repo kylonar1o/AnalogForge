@@ -1,0 +1,23 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install ngspice
+        run: sudo apt-get update && sudo apt-get install -y ngspice
+      - name: Install AnalogForge
+        run: pip install -e ".[dev]"
+      - name: Install SKY130 models
+        run: analogforge pdk install sky130
+      - name: Doctor
+        run: analogforge doctor --full
+      - name: Tests
+        run: pytest -q

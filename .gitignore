@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+afdata/
+af_spectre_selftest/
+report_*/
+out/
+*.raw
+*.log

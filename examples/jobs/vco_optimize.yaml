@@ -1,0 +1,12 @@
+kind: optimize
+name: VCO FoM optimization
+design: lc_vco
+options: {tuning_points: 3, phase_noise: leeson}
+optimize:
+  method: bayes
+  variables: {IBIAS: [1m, 4m], WN: [10u, 50u], MVAR: [60, 200]}
+  objective: "max:fom"
+  constraints: ["f_osc >= 3.0e9", "amplitude_diff >= 0.5", "tuning_range_pct >= 8"]
+  budget: 24
+  seed: 1
+workers: 4

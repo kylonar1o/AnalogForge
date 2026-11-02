@@ -1,0 +1,9 @@
+kind: sweep
+name: VCO tail-current sweep
+design: lc_vco
+sweep:
+  mode: grid
+  variables:
+    IBIAS: {start: 1m, stop: 4m, num: 7}
+options: {tuning_points: 0, phase_noise: leeson}
+workers: 4

@@ -1,0 +1,55 @@
+# TEMPLATE - PDK profile for an institute/foundry PDK used with Spectre and/or ADS.
+#
+# Copy this file (e.g. to ~/.analogforge/pdks/mypdk.yaml or any path), fill in
+# the <PLACEHOLDERS> from your PDK documentation, then use it with
+#   analogforge simulate lc_vco --backend spectre --pdk ~/.analogforge/pdks/mypdk.yaml
+# or set ANALOGFORGE_PDK_PATH to the directory containing it and use --pdk mypdk.
+#
+# Nothing in this file is real PDK data.  AnalogForge does not ship any
+# proprietary information; it only renders the templates you provide.
+#
+# Template syntax: {pin} for pin nets, {name} for the instance name, and any
+# expression of the device parameters (w, l in metres, nf, m) with an
+# optional Python format spec, e.g. {w*1e6:.4g} -> width in um.
+name: mypdk
+description: <describe the technology, e.g. "130 nm SiGe BiCMOS, 1.2 V core">
+license: <internal - do not publish model files>
+nominal_vdd: 1.2
+corners: [tt, ff, ss, fs, sf]          # section names of your corner library
+default_corner: tt
+temperatures: [-40, 27, 125]
+
+devices:
+  nmos:
+    pins: [d, g, s, b]
+    defaults: {nf: 1, m: 1}
+    # Spectre instance line; check the cell name and parameter names (w/l units!)
+    spectre: '{name} ({d} {g} {s} {b}) <NMOS_MODEL_OR_SUBCKT> w={w} l={l} ng={nf:.0f} m={m:.0f}'
+    # ADS netlist instance line; check cell name/parameters in your ADS PDK library
+    ads: '<NMOS_ADS_COMPONENT>:{name} {d} {g} {s} {b} w={w} l={l} ng={nf:.0f} m={m:.0f}'
+    op_path:
+      spectre: '{name}'               # e.g. '{name}.m0' if the device is a subckt wrapper
+    op_params:
+      spectre: {id: ids, gm: gm, gds: gds, vth: vth, vdsat: vdsat, cgg: cgg}
+  pmos:
+    pins: [d, g, s, b]
+    defaults: {nf: 1, m: 1}
+    spectre: '{name} ({d} {g} {s} {b}) <PMOS_MODEL_OR_SUBCKT> w={w} l={l} ng={nf:.0f} m={m:.0f}'
+    ads: '<PMOS_ADS_COMPONENT>:{name} {d} {g} {s} {b} w={w} l={l} ng={nf:.0f} m={m:.0f}'
+    op_path:
+      spectre: '{name}'
+    op_params:
+      spectre: {id: ids, gm: gm, gds: gds, vth: vth, vdsat: vdsat, cgg: cgg}
+  varactor:
+    pins: [g, nw, b]
+    defaults: {m: 1}
+    spectre: '{name} ({g} {nw}) <VARACTOR_SUBCKT> w={w} l={l} m={m:.0f}'
+    ads: '<VARACTOR_ADS_COMPONENT>:{name} {g} {nw} w={w} l={l} m={m:.0f}'
+
+models:
+  spectre:
+    # typical ADE model setup: one library file with corner sections
+    include: '<ABSOLUTE/PATH/TO/models/spectre/corners.scs>'
+    section: '{corner}'
+  ads:
+    include: '<ABSOLUTE/PATH/TO/ads/model_include.net>'

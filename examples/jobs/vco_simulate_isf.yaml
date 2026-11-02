@@ -1,0 +1,10 @@
+# Single VCO evaluation with simulation-based (ISF) phase noise, 7-point tuning curve and PSS cross-check.
+# analogforge run examples/jobs/vco_simulate_isf.yaml
+kind: simulate
+name: VCO nominal + ISF phase noise
+design: lc_vco
+backend: ngspice
+pdk: sky130
+corner: tt
+temperature: 27
+options: {phase_noise: isf, isf_points: 12, tuning_points: 7, pss: true}

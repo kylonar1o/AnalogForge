@@ -1,0 +1,9 @@
+kind: corners
+name: VCO PVT
+design: lc_vco
+corners:
+  process: [tt, ff, ss, sf, fs]
+  voltage: [0.9, 1.0, 1.1]
+  temperature: [-40, 27, 125]
+options: {tuning_points: 3, phase_noise: leeson}
+workers: 4

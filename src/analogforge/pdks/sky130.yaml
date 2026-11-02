@@ -1,0 +1,75 @@
+# SkyWater SKY130 open-source PDK profile (models: Apache-2.0, SkyWater/Google).
+#
+# ngspice: fully supported and tested (models located/installed by
+#          `analogforge pdk install sky130`, see analogforge/pdks/sky130.py).
+# spectre / ads: SkyWater does not publish official Spectre or ADS model
+#          files for SKY130.  The entries below only demonstrate the syntax
+#          AnalogForge generates; point the include paths at a converted model
+#          library if you have one, or (normally) use an institute PDK profile
+#          based on template_institute.yaml.
+name: sky130
+description: SkyWater SKY130 (130 nm) open PDK, 1.8 V core devices
+license: Apache-2.0 (device models); this profile file is MIT
+nominal_vdd: 1.8
+corners: [tt, ff, ss, sf, fs]
+default_corner: tt
+temperatures: [-40, 27, 125]
+
+devices:
+  nmos:
+    description: sky130_fd_pr__nfet_01v8 (BSIM4), W/L in metres in AnalogForge
+    pins: [d, g, s, b]
+    defaults: {nf: 1, m: 1}
+    limits: {l: [0.15e-6, 100e-6], w: [0.42e-6, 100e-6]}
+    ngspice: >-
+      X{name} {d} {g} {s} {b} sky130_fd_pr__nfet_01v8 W={w*1e6:.6g} L={l*1e6:.6g} nf={nf:.0f}
+      ad={int((nf+1)/2)*w*1e6/nf*0.29:.6g} as={int((nf+2)/2)*w*1e6/nf*0.29:.6g}
+      pd={2*int((nf+1)/2)*(w*1e6/nf+0.29):.6g} ps={2*int((nf+2)/2)*(w*1e6/nf+0.29):.6g} m={m:.0f}
+    spectre: '{name} ({d} {g} {s} {b}) sky130_fd_pr__nfet_01v8 w={w*1e6:.6g} l={l*1e6:.6g} nf={nf:.0f} m={m:.0f}'
+    ads: 'sky130_fd_pr__nfet_01v8:{name} {d} {g} {s} {b} w={w*1e6:.6g} l={l*1e6:.6g} nf={nf:.0f} m={m:.0f}'
+    op_path:
+      ngspice: 'm.x{name}.msky130_fd_pr__nfet_01v8'
+      spectre: '{name}.msky130_fd_pr__nfet_01v8'
+    op_params:
+      ngspice: {id: id, gm: gm, gds: gds, gmb: gmbs, vth: vth, vdsat: vdsat, cgg: cgg, vgs: vgs, vds: vds}
+      spectre: {id: ids, gm: gm, gds: gds, gmb: gmbs, vth: vth, vdsat: vdsat, cgg: cgg, vgs: vgs, vds: vds}
+  pmos:
+    description: sky130_fd_pr__pfet_01v8 (BSIM4)
+    pins: [d, g, s, b]
+    defaults: {nf: 1, m: 1}
+    limits: {l: [0.15e-6, 100e-6], w: [0.42e-6, 100e-6]}
+    ngspice: >-
+      X{name} {d} {g} {s} {b} sky130_fd_pr__pfet_01v8 W={w*1e6:.6g} L={l*1e6:.6g} nf={nf:.0f}
+      ad={int((nf+1)/2)*w*1e6/nf*0.29:.6g} as={int((nf+2)/2)*w*1e6/nf*0.29:.6g}
+      pd={2*int((nf+1)/2)*(w*1e6/nf+0.29):.6g} ps={2*int((nf+2)/2)*(w*1e6/nf+0.29):.6g} m={m:.0f}
+    spectre: '{name} ({d} {g} {s} {b}) sky130_fd_pr__pfet_01v8 w={w*1e6:.6g} l={l*1e6:.6g} nf={nf:.0f} m={m:.0f}'
+    ads: 'sky130_fd_pr__pfet_01v8:{name} {d} {g} {s} {b} w={w*1e6:.6g} l={l*1e6:.6g} nf={nf:.0f} m={m:.0f}'
+    op_path:
+      ngspice: 'm.x{name}.msky130_fd_pr__pfet_01v8'
+      spectre: '{name}.msky130_fd_pr__pfet_01v8'
+    op_params:
+      ngspice: {id: id, gm: gm, gds: gds, gmb: gmbs, vth: vth, vdsat: vdsat, cgg: cgg, vgs: vgs, vds: vds}
+      spectre: {id: ids, gm: gm, gds: gds, gmb: gmbs, vth: vth, vdsat: vdsat, cgg: cgg, vgs: vgs, vds: vds}
+  varactor:
+    description: >-
+      sky130_fd_pr__cap_var_lvt MOS varactor (poly gate g, n-well nw, substrate b).
+      C rises with V(g)-V(nw): ~1.1 fF/um^2 (depleted) to ~8.4 fF/um^2 (accumulated) at W=10u L=1u.
+    pins: [g, nw, b]
+    defaults: {m: 1}
+    limits: {l: [0.18e-6, 10e-6], w: [1e-6, 20e-6]}
+    ngspice: 'X{name} {g} {nw} {b} sky130_fd_pr__cap_var_lvt w={w*1e6:.6g} l={l*1e6:.6g} vm={m:.0f}'
+    spectre: '{name} ({g} {nw} {b}) sky130_fd_pr__cap_var_lvt w={w*1e6:.6g} l={l*1e6:.6g} vm={m:.0f}'
+    ads: 'sky130_fd_pr__cap_var_lvt:{name} {g} {nw} {b} w={w*1e6:.6g} l={l*1e6:.6g} vm={m:.0f}'
+
+models:
+  ngspice:
+    loader: sky130
+  spectre:
+    include: '$SKY130_SPECTRE_LIB'      # no official Spectre models exist - see header
+    section: '{corner}'
+  ads:
+    include: '$SKY130_ADS_LIB'          # no official ADS models exist - see header
+
+backend_options:
+  ngspice:
+    defines: [ngbehavior=hsa, ng_nomodcheck, skywaterpdk]
