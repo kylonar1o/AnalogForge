@@ -1,7 +1,8 @@
 """Design registry: built-in Python designs plus YAML designs found on the search path.
 
-YAML designs are searched in ``examples/designs`` of a source checkout,
-``$ANALOGFORGE_DESIGN_PATH`` (``os.pathsep`` separated) and
+YAML designs are searched in ``$ANALOGFORGE_DESIGN_PATH`` (``os.pathsep``
+separated), the built-in ``analogforge/designs/yaml`` directory (shipped with
+the package), ``./designs`` of the current directory and
 ``~/.analogforge/designs``.  A path to a ``.yaml`` file is always accepted.
 """
 
@@ -24,8 +25,8 @@ def _yaml_dirs() -> list[Path]:
     for d in os.environ.get("ANALOGFORGE_DESIGN_PATH", "").split(os.pathsep):
         if d:
             dirs.append(Path(d).expanduser())
-    repo_examples = Path(__file__).resolve().parents[3] / "examples" / "designs"
-    dirs.append(repo_examples)
+    dirs.append(Path(__file__).resolve().parent / "yaml")
+    dirs.append(Path.cwd() / "designs")
     dirs.append(Path.home() / ".analogforge" / "designs")
     return dirs
 

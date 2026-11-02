@@ -84,7 +84,7 @@ Fill in the placeholders:
 
 ```bash
 # AnalogForge-described circuit, direct Spectre run
-analogforge simulate examples/designs/cs_amplifier.yaml --backend spectre --pdk mypdk
+analogforge simulate cs_amplifier --backend spectre --pdk mypdk
 # PVT and sweeps work the same way as with ngspice
 analogforge corners lc_vco --backend spectre --pdk mypdk --process tt,ss,ff
 # native phase noise (PSS + pnoise) instead of the ngspice ISF estimate
@@ -103,11 +103,11 @@ technology: use `-p NAME=VALUE` or a YAML job file).
    you want to sweep/optimize (`Ibias`, `Vtune`, ...).
 2. Write a small YAML design that lists those variables as `parameters`, an
    empty `circuit: []`, the analyses, the probe nodes and the metrics — see
-   `examples/designs/virtuoso_vco_tb.yaml`.
+   `examples/cadence/virtuoso_vco_tb.yaml`.
 3. Run with the OCEAN backend options:
 
 ```bash
-analogforge sweep examples/designs/virtuoso_vco_tb.yaml --var Vtune=0:1.2:7 \
+analogforge sweep examples/cadence/virtuoso_vco_tb.yaml --var Vtune=0:1.2:7 \
     --backend spectre --pdk mypdk --backend-opt mode=ocean --backend-opt cellview=MyLib/vco_tb/schematic
 ```
 
@@ -117,7 +117,7 @@ The same works from Python:
 from analogforge.backends.base import get_backend
 from analogforge.core.design import evaluate
 be = get_backend("spectre", mode="ocean", cellview=("MyLib", "vco_tb", "schematic"))
-res = evaluate("examples/designs/virtuoso_vco_tb.yaml", {"Vtune": 0.8}, backend=be, pdk="mypdk")
+res = evaluate("examples/cadence/virtuoso_vco_tb.yaml", {"Vtune": 0.8}, backend=be, pdk="mypdk")
 print(res.metrics)
 ```
 

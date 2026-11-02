@@ -121,7 +121,7 @@ Designs subclass `analogforge.core.design.Design` (`parameters`, `metrics`,
 `testbenches()`, `measure()`); `measure()` may launch follow-up simulations
 (the ISF procedure and the tuning sweep do).
 
-**YAML** (see `examples/designs/` and [`docs/yaml_format.md`](docs/yaml_format.md)):
+**YAML** (built-in examples in `src/analogforge/designs/yaml/`; see [`docs/yaml_format.md`](docs/yaml_format.md)):
 
 ```yaml
 name: rc_lowpass
@@ -191,7 +191,7 @@ Full guide: [`docs/cadence_spectre.md`](docs/cadence_spectre.md).  In short:
    PSF-ASCII results), or drive an **existing ADE testbench** through OCEAN:
    `--backend-opt mode=ocean --backend-opt cellview=MyLib/vco_tb/schematic`
    with a YAML file listing its design variables
-   (`examples/designs/virtuoso_vco_tb.yaml`).
+   (`examples/cadence/virtuoso_vco_tb.yaml`).
 4. `-o phase_noise=pnoise` uses Spectre `pss`+`pnoise` instead of the ngspice estimate.
 
 ## Keysight ADS
@@ -224,7 +224,7 @@ Repository layout:
 ```
 docs/                architecture, YAML format, phase noise, Cadence, ADS, limitations, validation
 src/analogforge/     core/ backends/ pdks/ designs/ metrics/ flows/ web/ store.py plots.py jobs.py cli.py
-examples/            designs/*.yaml  jobs/*.yaml  python/*.py
+examples/            jobs/*.yaml  python/*.py  cadence/ (Virtuoso/OCEAN example)
 scripts/             validate.py  spectre_selftest.py  ads_selftest.py  package.sh
 tests/               pytest suite (simulation tests use real ngspice + SKY130)
 ```

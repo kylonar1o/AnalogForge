@@ -39,7 +39,7 @@ analogforge = "analogforge.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-analogforge = ["web/static/*", "pdks/*.yaml"]
+analogforge = ["web/static/*", "pdks/*.yaml", "designs/yaml/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

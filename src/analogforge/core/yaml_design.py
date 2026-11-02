@@ -1,6 +1,6 @@
 """Declarative YAML designs.
 
-Example (see ``examples/designs/*.yaml`` and ``docs/yaml_format.md``)::
+Example (see ``analogforge/designs/yaml/*.yaml`` and ``docs/yaml_format.md``)::
 
     name: rc_lowpass
     kind: amplifier

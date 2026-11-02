@@ -1,5 +1,5 @@
 # Minimal YAML design (no PDK devices): first-order RC low-pass.
-# analogforge simulate examples/designs/rc_lowpass.yaml
+# analogforge simulate rc_lowpass
 name: rc_lowpass
 title: RC low-pass filter
 kind: amplifier

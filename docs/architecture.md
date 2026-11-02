@@ -419,11 +419,11 @@ analogforge/
     pdks/               sky130.yaml sky130.py template_institute.yaml
     backends/           base.py ngspice/ spectre/ ads/
     metrics/            waveform.py amplifier.py oscillator.py phasenoise.py
-    designs/            lc_vco.py two_stage_opamp.py (registry also loads YAML)
+    designs/            lc_vco.py two_stage_opamp.py yaml/*.yaml (registry also loads user YAML)
     flows/              executor.py sweep.py corners.py optimize.py
     store.py plots.py jobs.py cli.py expr.py units.py
     web/                app.py static/
-  examples/             designs/*.yaml  jobs/*.yaml  python/*.py
+  examples/             jobs/*.yaml  python/*.py  cadence/*.yaml
   tests/
   scripts/              spectre_selftest.sh  ads_selftest.py  package.sh
 ```

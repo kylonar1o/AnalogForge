@@ -2,11 +2,11 @@
 # The circuit lives in Virtuoso; AnalogForge only sets design variables (desVar), runs the analyses
 # listed here and post-processes the exported probe waveforms.  Use on a Cadence machine:
 #
-#   analogforge simulate examples/designs/virtuoso_vco_tb.yaml --backend spectre \
+#   analogforge simulate examples/cadence/virtuoso_vco_tb.yaml --backend spectre \
 #       --pdk ~/.analogforge/pdks/mypdk.yaml \
 #       --backend-opt mode=ocean --backend-opt cellview=MyLib/vco_tb/schematic
 #
-#   analogforge sweep examples/designs/virtuoso_vco_tb.yaml --var Vtune=0:1.2:7 --backend spectre ...
+#   analogforge sweep examples/cadence/virtuoso_vco_tb.yaml --var Vtune=0:1.2:7 --backend spectre ...
 #
 # Parameter names must equal the design variables of your ADE testbench; probe node names must
 # exist in the schematic (top level).

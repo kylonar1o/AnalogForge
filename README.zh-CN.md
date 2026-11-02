@@ -55,7 +55,7 @@ ISF 的 Γ_rms(tank) = 0.718，与理论值 1/√2 = 0.707 吻合。
 3. `analogforge simulate lc_vco --backend spectre --pdk mypdk`（直接调用 spectre，解析 PSF-ASCII）；
    或用 OCEAN 驱动已有的 ADE testbench：
    `--backend-opt mode=ocean --backend-opt cellview=MyLib/vco_tb/schematic`
-   （参考 `examples/designs/virtuoso_vco_tb.yaml`，参数名=ADE 设计变量）。
+   （参考 `examples/cadence/virtuoso_vco_tb.yaml`，参数名=ADE 设计变量）。
 4. `-o phase_noise=pnoise` 使用 Spectre 原生 `pss + pnoise` 相位噪声。
 
 ## 接入 ADS

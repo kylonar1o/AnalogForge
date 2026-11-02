@@ -63,7 +63,7 @@ If the dataset names differ, adjust `backends/ads/api.py:read_dataset` or
    HB/Tran/AC controllers).  Put every quantity you want to vary into a `VAR`
    block (e.g. `Ibias`, `Vtune`, `Wn`).
 2. Describe the parameters and metrics in a small YAML design with an empty
-   circuit (like `examples/designs/virtuoso_vco_tb.yaml`), with analysis names
+   circuit (like `examples/cadence/virtuoso_vco_tb.yaml`), with analysis names
    that match your controllers' dataset blocks.
 3. Run from Python (inside the ADS Python):
 
