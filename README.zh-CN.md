@@ -73,6 +73,6 @@ ISF 相噪流程（`analogforge/flows/isf.py`）与拓扑无关，可直接复�
 ## 测试
 
 ```bash
-pytest -q                     # 约 100 个测试，4 核约 2 分钟
+pytest -q                     # 92 个测试，4 核约 80 秒
 python scripts/validate.py    # 由真实仿真重新生成 docs/validation.md
 ```

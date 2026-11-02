@@ -54,7 +54,7 @@ function plotCurve(el, curve, extraTraces = null) {
 async function loadDesign(name) {
   const d = await api(`/api/designs/${encodeURIComponent(name)}`);
   state.design = d;
-  $("#f-design-desc").textContent = (d.description || "").split("\n").slice(0, 6).join("\n");
+  $("#f-design-desc").textContent = (d.description || "").split("\n\n")[0];
   $("#f-options").value = JSON.stringify(d.options || {}, null, 1);
   const rows = d.parameters.map(p => `<tr data-name="${esc(p.name)}">
       <td><b>${esc(p.name)}</b></td>
@@ -255,13 +255,15 @@ async function loadCompare() {
   if (!state.compare.size) { $("#cmp-table").innerHTML = "<tr><td class='muted'>no runs selected</td></tr>"; $("#cmp-plot").innerHTML = ""; $("#cmp-curve").innerHTML = ""; return; }
   const c = await api(`/api/compare?ids=${[...state.compare].join(",")}`);
   const runs = c.runs, first = runs[0];
+  if (!state.design || state.design.name !== first.design) { try { state.design = await api(`/api/designs/${encodeURIComponent(first.design)}`); } catch { } }
   const head = `<tr><th></th>${runs.map(r => `<th>#${r.id} ${esc(r.design)}<br><span class="small muted">${esc(r.corner)} ${r.temperature}°C ×${r.vdd_scale}</span></th>`).join("")}</tr>`;
   const mrow = m => `<tr><td>${esc(m)}</td>${runs.map(r => {
     const v = r.metrics[m], v0 = first.metrics[m];
     const d = (r !== first && v !== null && v0) ? ` <span class="small muted">(${((v - v0) / Math.abs(v0) * 100).toFixed(1)}%)</span>` : "";
-    return `<td class="num">${fmt(v)}${d}</td>`;
+    return `<td class="num">${fmt(v, unitOf(m))}${d}</td>`;
   }).join("")}</tr>`;
-  const prow = p => `<tr><td class="muted">${esc(p)}</td>${runs.map(r => `<td class="num muted">${fmt(r.params[p])}</td>`).join("")}</tr>`;
+  const punit = n => ((state.design?.parameters || []).find(x => x.name === n) || {}).unit || "";
+  const prow = p => `<tr><td class="muted">${esc(p)}</td>${runs.map(r => `<td class="num muted">${fmt(r.params[p], punit(p))}</td>`).join("")}</tr>`;
   $("#cmp-table").innerHTML = head + `<tr><th colspan="${runs.length + 1}">metrics</th></tr>` + c.metrics.map(mrow).join("") +
     `<tr><th colspan="${runs.length + 1}">parameters</th></tr>` + c.params.map(prow).join("");
   const names = [...new Set(runs.flatMap(r => (r.curves || []).map(cv => cv.name)))];

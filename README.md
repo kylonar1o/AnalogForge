@@ -232,7 +232,7 @@ tests/               pytest suite (simulation tests use real ngspice + SKY130)
 ## Testing
 
 ```bash
-pytest -q                     # ~100 tests, ~2 min on 4 cores; installs SKY130 on first use if missing
+pytest -q                     # 92 tests, ~80 s on 4 cores; installs SKY130 on first use if missing
 python scripts/validate.py    # regenerates docs/validation.md from real simulations
 ```
 
